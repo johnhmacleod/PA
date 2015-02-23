@@ -15,7 +15,7 @@ static int toggle;
 
 int16_t getLayerBounds(void *subject)
 {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "In bounds getter function:");
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "In bounds getter function:");
   GRect temp = layer_get_bounds((Layer*)subject);
   return(temp.origin.x);
 };
@@ -23,15 +23,15 @@ int16_t getLayerBounds(void *subject)
 void setLayerBounds(void *subject, int16_t new_bounds)
 {
     // APP_LOG(APP_LOG_LEVEL_INFO, "In setter function: x=%d y=%d w=%d h=%d",new_bounds.origin.x,new_bounds.origin.y,new_bounds.size.w,new_bounds.size.h);
-  APP_LOG(APP_LOG_LEVEL_INFO, "In setter with %d", new_bounds);
+  //APP_LOG(APP_LOG_LEVEL_INFO, "In setter with %d", new_bounds);
   GRect b;
   b = layer_get_bounds(subject);
   b.origin.x = new_bounds;
   layer_set_bounds((Layer *)subject, b);
 };
 
-int global_fr, global_to;
 
+/*
 void myUpdateInt16(PropertyAnimation *anim, int norm)
   {
   int fr, to, val, dif;
@@ -46,12 +46,13 @@ void myUpdateInt16(PropertyAnimation *anim, int norm)
   ((PropertyAnimationImplementation *)(anim->animation.implementation))->accessors.setter.int16(anim->subject, val);
       
 }
+*/
 
 static const PropertyAnimationImplementation my_implementation = {
   .base = {
     // using the "stock" update callback:
-   // .update = (AnimationUpdateImplementation) property_animation_update_int16,
-    .update = (AnimationUpdateImplementation) myUpdateInt16,
+   .update = (AnimationUpdateImplementation) property_animation_update_int16,
+   // .update = (AnimationUpdateImplementation) myUpdateInt16,
   },
   .accessors = {
     // my accessors that get/set a GRect from/onto my subject:
@@ -69,22 +70,24 @@ static void animation_stopped(PropertyAnimation *animation, bool finished, void 
 static void animate_layer_bounds(PropertyAnimation **anim, Layer* layer, GRect *start, GRect *finish, int duration, int delay)
 {
   static int s, f;
+  
   s = start->origin.x;
   f = finish->origin.x;
-  global_fr = s;  // Cheat to get the values passed in
-  global_to = f;  // Cheat to get the values passed in
-  
   
   APP_LOG(APP_LOG_LEVEL_INFO, "animate_layer_bounds -> start: x:y w:h %d:%d %d:%d finish: %d:%d %d:%d", 
           (int)start->origin.x, (int)start->origin.y,(int)start->size.w, (int)start->size.h,
           (int)finish->origin.x, (int)finish->origin.y,(int)finish->size.w, (int)finish->size.h);
   *anim = property_animation_create(&my_implementation, layer, &s, &f);
   
+  // These two lines workaround bug in SDK 
+  (*anim)->values.from.int16 = s;
+  (*anim)->values.to.int16 = f;
+  
   AnimationHandlers handlers = {
         //The reference to the stopped handler is the only one in the array
         .stopped = (AnimationStoppedHandler) animation_stopped
     };
-  
+
   animation_set_handlers((Animation*) *anim, handlers, NULL);
   animation_set_duration((Animation*) *anim, duration);
   animation_set_delay((Animation*) *anim, delay);
@@ -132,8 +135,8 @@ static void init(void) {
   window_set_click_config_provider(window, (ClickConfigProvider) config_provider);
   window_stack_push(window, false);
 
-  text_layer = text_layer_create(GRect(0, 0, 144, 60));
-  layer_set_frame((Layer *)text_layer, GRect(0, 0, 60, 60)); //Frame smaller than the bounds
+  text_layer = text_layer_create(GRect(0, 0, 94, 60));
+  layer_set_frame((Layer *)text_layer, GRect(50, 0, 60, 60)); //Frame smaller than the bounds
   text_layer_set_text(text_layer, "01234567890ABCDEFGHIJ");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
 
