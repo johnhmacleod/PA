@@ -1,6 +1,7 @@
 #include "pebble.h"
 
 #include <stdlib.h>
+  #include <math.h>
 
 static Window *window;
 
@@ -8,7 +9,6 @@ static TextLayer *text_layer;
 
 static PropertyAnimation *prop_animation;
 
-static int toggle;
 
 
 //Layerbounds Animation
@@ -80,8 +80,8 @@ static void animate_layer_bounds(PropertyAnimation **anim, Layer* layer, GRect *
   *anim = property_animation_create(&my_implementation, layer, &s, &f);
   
   // These two lines workaround bug in SDK 
-  (*anim)->values.from.int16 = s;
-  (*anim)->values.to.int16 = f;
+ //(*anim)->values.from.int16 = s;
+ //(*anim)->values.to.int16 = f;
   
   AnimationHandlers handlers = {
         //The reference to the stopped handler is the only one in the array
@@ -117,6 +117,7 @@ static void click_handler(ClickRecognizerRef recognizer, Window *window) {
   
   switch (click_recognizer_get_button_id(recognizer)) {
     case BUTTON_ID_UP:
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", (int)sin(1));
           animate_layer_bounds(&p1, layer, &start, &finish, 1000, 0);
       break;
     

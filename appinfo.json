@@ -9,7 +9,12 @@
     "resources": {
         "media": []
     },
+    "sdkVersion": "3",
     "shortName": "PA",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
     "uuid": "25239828-c998-4f2d-a4ba-4c1ec3392d13",
     "versionCode": 1,
     "versionLabel": "1.0",
